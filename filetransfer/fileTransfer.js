@@ -23,7 +23,7 @@ function startSending(_host){
   var check = '';
   var DIR ='/Users/a/testFile/'
 
-socket.connect('8080','192.168.1.107',function(){
+socket.connect('8080',_host,function(){
 
   socket.on('connect',function() {
     console.log('Client connected !');
