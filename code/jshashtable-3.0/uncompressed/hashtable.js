@@ -19,7 +19,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var Hashtable = (function(UNDEFINED) {
+function Hashtable(UNDEFINED) {
     var FUNCTION = "function", STRING = "string", UNDEF = "undefined";
 
     // Require Array.prototype.splice, Object.prototype.hasOwnProperty and encodeURIComponent. In environments not
@@ -399,4 +399,6 @@ var Hashtable = (function(UNDEFINED) {
     };
 
     return Hashtable;
-})();
+};
+
+exports.Hashtable = Hashtable;
