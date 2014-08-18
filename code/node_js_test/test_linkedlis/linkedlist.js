@@ -20,15 +20,12 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-//double linked list in node
+//double linked list in js
 //extended by xiquan
 
-function init(list,dataURI,edit_id) {
+function init(list) {
   list._idleNext = list;
   list._idlePrev = list;
-  list._head = edit_id;
-  list._tail = "true";
-  list._dataURI = dataURI;
 }
 exports.init = init;
 
@@ -74,7 +71,7 @@ function append(list, item) {
   item._idlePrev = list;
   list._idleNext = item;
   //set the last version as the tail
-  list.tail = item.edit_id;
+  list._tail = item._edit_id;
 }
 exports.append = append;
 
@@ -93,7 +90,7 @@ for(var k in array){
     dataURI : array[k].dataURI,
     edit_id : array[k].edit_id
   }
-  append(list,array[k])
+  append(list,tmpItem)
 }
 return list;
 }
