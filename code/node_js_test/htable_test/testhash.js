@@ -7,7 +7,7 @@ function HashTable(){
 		table.put(key,value)
 	}
 	this.get = function (key){
-		table.get(key);
+		return table.get(key);
 	}
 	this.remove = function(key){
 		table.remove(key);
