@@ -58,9 +58,9 @@ var dataArray = [
 
 
 test.init();
-test.createFromArray(tempdata,dataArray);
+//test.createFromArray(tempdata,dataArray);
 
-console.log(test.getNode("tempdata4"));
+//console.log(test.getNode("tempdata4"));
 /*
 t1.createHash(data);
 test.init(tempdata);
@@ -75,23 +75,29 @@ for(var k in data){
 console.log("==============");
 
 
-/*
-test.insert(tempdata);
-test.print();
-console.log(test.head.data.dataURI);
+
+test.insert("test_1");
+//test.print();
+console.log(test.tail);console.log("==============");
 test.insert("test_2");
-test.print();
+console.log(test.tail);console.log("==============");
+//test.print();
 test.insert("test_3");
-test.print();
+console.log(test.tail);console.log("==============");
+//test.print();
 test.insert("test_4");
-test.print();
+console.log(test.tail);console.log("==============");
+//test.print();
 test.insert("test_5");
-test.print();
+console.log(test.tail);console.log("==============");
+//test.print();
 test.insert("test_6");
-test.print();
+console.log(test.tail);console.log("==============");
+//test.print();
 test.insert("test_7");
-test.print();
-*/
+console.log(test.tail);console.log("==============");
+//test.print();
+
 //console.log(test.head.next.data);
 //console.log(test.head.next.next.data);
 //console.log(test.head.next.next.next.data);
