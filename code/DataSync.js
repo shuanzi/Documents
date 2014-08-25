@@ -53,20 +53,23 @@ function syncDeleteAction(other_deleteHistory,deleteCallBack){
 //Sync insert action
 function syncInsertAction(other_insertHistory,insertCallBack){
 	commonDAO.findEachActionHistory("insert",function(my_insertHistory){
-		insertCallBack(other_insertHistory,my_insertHistory);
+		insertCallBack(other_insertHistory,my_insertHistory);////////////////////////
 	});
 }
 
-//Sync insert action
-function syncUpdateAction(other_updateHistory,updateCallBack){
-	commonDAO.findEachActionHistory("update",function(my_updateHistory){
-		updateCallBack(other_updateHistory,my_updateHistory);
+//Sync update action
+function syncUpdateAction(other_updateHistory,other_updateOperations,updateCallBack){
+	//commonDAO.findAboutUpdate(function(my_updateHistory,my_updateOperations){
+	//	updateCallBack(other_updateHistory,my_updateHistory,other_updateOperations,my_updateOperations);
+	//});
+	commonDAO.findEachActionHistory("update",function(my_updateHistory,my_updateOperations){
+		updateCallBack(other_updateHistory,my_updateHistory,other_updateOperations,my_updateOperations);
 	});
 }
 
 //deal with version control
-function versionCtrl(myTrees,other_trees,versionCtrlCB,CBsyncComplete){
-	versionCtrlCB(myTrees,other_trees);
+function versionCtrl(my_linklist,my_updateOperations,other_linklist,other_updateOperations,versionCtrlCB,CBsyncComplete){
+	versionCtrlCB(my_linklist,my_updateOperations,other_linklist,other_updateOperations);
 }
 
 //Send sync request when other devices connect the net.
@@ -78,61 +81,61 @@ function syncRequest(deviceName,deviceId,deviceAddress){
   }*/
 
   switch(currentState){
-	case state.SYNC_IDLE: {
-		console.log("syncRequest==========" + currentState);
-		currentState = state.SYNC_REQUEST;
-		remoteDeviceId = deviceId;
-		var syncDevice = {
-			deviceName: deviceName,
-			deviceId: deviceId,
-			deviceAddress: deviceAddress,
-			status: "sync"
-		};
-		syncList.unshift(syncDevice);
-		var requestMsg = {
+  	case state.SYNC_IDLE: {
+  		console.log("syncRequest==========" + currentState);
+  		currentState = state.SYNC_REQUEST;
+  		remoteDeviceId = deviceId;
+  		var syncDevice = {
+  			deviceName: deviceName,
+  			deviceId: deviceId,
+  			deviceAddress: deviceAddress,
+  			status: "sync"
+  		};
+  		syncList.unshift(syncDevice);
+  		var requestMsg = {
   			type: "syncRequest",
   			account: config.ACCOUNT,
   			deviceId: config.uniqueID,
   			deviceAddress: config.SERVERIP
   		};
   		syncSendMessage(deviceAddress[0],requestMsg);
-	}
-	break;
-	case state.SYNC_REQUEST: {
-		console.log("syncRequest=============" + currentState);
-		var syncDevice = {
-			deviceName: deviceName,
-			deviceId: deviceId,
-			deviceAddress: deviceAddress,
-			status: "wait"
-		};
-		syncList.push(syncDevice);
-	}
-	break;
-	case state.SYNC_START: {
-		console.log("syncRequest============" + currentState);
-		var syncDevice = {
-			deviceName: deviceName,
-			deviceId: deviceId,
-			deviceAddress: deviceAddress,
-			status: "wait"
-		};
-		syncList.push(syncDevice);
-	}
-	break;
-	case state.SYNC_COMPLETE: {
-		console.log("syncRequest==========" + currentState);
-		var syncDevice = {
-			deviceName: deviceName,
-			deviceId: deviceId,
-			deviceAddress: deviceAddress,
-			status: "wait"
-		};
-		syncList.push(syncDevice);
-	}
-	break;
-	default: {
-		console.log("this is in default switch in syncRequest");
+  	}
+  	break;
+  	case state.SYNC_REQUEST: {
+  		console.log("syncRequest=============" + currentState);
+  		var syncDevice = {
+  			deviceName: deviceName,
+  			deviceId: deviceId,
+  			deviceAddress: deviceAddress,
+  			status: "wait"
+  		};
+  		syncList.push(syncDevice);
+  	}
+  	break;
+  	case state.SYNC_START: {
+  		console.log("syncRequest============" + currentState);
+  		var syncDevice = {
+  			deviceName: deviceName,
+  			deviceId: deviceId,
+  			deviceAddress: deviceAddress,
+  			status: "wait"
+  		};
+  		syncList.push(syncDevice);
+  	}
+  	break;
+  	case state.SYNC_COMPLETE: {
+  		console.log("syncRequest==========" + currentState);
+  		var syncDevice = {
+  			deviceName: deviceName,
+  			deviceId: deviceId,
+  			deviceAddress: deviceAddress,
+  			status: "wait"
+  		};
+  		syncList.push(syncDevice);
+  	}
+  	break;
+  	default: {
+  		console.log("this is in default switch in syncRequest");
 		//console.log(data);
 	}
 }
@@ -295,6 +298,7 @@ function syncStart(syncData, address){
 	var insertActions = JSON.parse(syncData.insertActions);
 	var deleteActions = JSON.parse(syncData.deleteActions);
 	var updateActions = JSON.parse(syncData.updateActions);
+	var updateOperations; //= JSON.parse(syncData.updateOperations);
 
 	console.log("insert actions: ");
 	console.log(insertActions);
@@ -302,134 +306,337 @@ function syncStart(syncData, address){
 	console.log(deleteActions);
 	console.log("update actions: ");
 	console.log(updateActions);
+	console.log("update operations: ");
+	// /console.log(updateOperations);	
 
 	//var deletetList = new Array();
 	//var insertList = new Array();
 	var updateList = new Array();
 	var conflictList = new Array();
 
-	//Sync data, delete > insert > update
+	////Sync data, delete > insert > update
 	syncDeleteAction(deleteActions,function(deleteActions,my_deleteHistory){
 		var myDelete = new hashTable.HashTable();
 		myDelete.createHash(my_deleteHistory);
 
 		console.log("==========start sync delete!!!==========");
+		//these are new delete actions
 		var newDelete = myDelete.getDiff(deleteActions,myDelete);
 		console.log("==========new delete history==========");
 		console.log(newDelete);
+		//create delete hository
 		ActionHistory.createAll("delete",newDelete,function(){console.log("==========delete insert done!!!==========")});
 
-		//Retrive actions after delete, start to sync insert actions 
+		////Retrive actions after delete, start to sync insert actions 
 		syncInsertAction(insertActions,function(insertActions,my_insertHistory){
 			var myInsert = new hashTable.HashTable();
 			myInsert.createHash(my_insertHistory);
 
 			//remove some repeat insert items in insertActions
 			insertActions = myInsert.getDiff(insertActions,myDelete);
-            
+
 			console.log("==========start sync insert!!!==========");
+			//these are new insert actions
 			var newInsert = myInsert.getDiff(insertActions,myInsert);
 
-            console.log("==========new insert history==========");
+			console.log("==========new insert history==========");
 			console.log(newInsert);
+			//create insert hository
 			ActionHistory.createAll("insert",newInsert,function(){console.log("==========insert done!!!==========")});
 
 			////Retrive actions after insert, start to sync update actions 
-			syncUpdateAction(updateActions,function(updateActions,my_updateHistory){
+			syncUpdateAction(updateActions,updateOperations,function(updateActions,my_updateHistory,my_updateOperations){//////////////
 				console.log("==========start sync update!!!==========");
 				console.log("----------my update actions----------");
-				console.log(updateActions);
-			    var myUpdate = new hashTable.HashTable();
-			    myUpdate.createHash(my_updateHistory);
+				console.log(my_updateHistory);
+			    //var myUpdate = new hashTable.HashTable();
+			    //myUpdate.createHash(my_updateHistory);
 
-			    //condition #1 : no conflict oprate on data; new upadte history
-				updateActions.forEach(function(updateItem){
-					if(!isExist(my_updateHistory,updateItem))
-						newUpdateList.push(updateItem);
-				});
-				//ActionHistory.createAll("update",newUpdateList,function(){console.log("---insert update done!!!---")});
-
-                //condition #2 : there are conflicts on operating data
-                //1>no conflict: operate on the same data but the results are the same
-                //2>is conflict: operate on same data and same key
-
-			    //insert items (need it's edit_id) should be 
-			    //the head all each version tree
-			    var initTreeHead = my_insertHistory.concat(newInsert);
-			    console.log("----------init heads----------");
-			    console.log(initTreeHead);
-
-			    //when all heads are ready 
-			    //then we begin to build all version tree in local
-			    console.log("----------building trees----------")
-			    var myTrees = new Array();//new hashTable.HashTable();
-			    for(var k in initTreeHead){
-			    	var newTree = new llist.linklist();
-			    	newTree.init(initTreeHead[k]);
-			    	newTree.createFromArray(my_updateHistory);
-			    	myTrees.push(newTree);
-			    	console.log("<show me the linklist>")
-			    	newTree.print()
-			    	//myTrees.put(newTree.head.data.dataURI,newTree);
-			    }
-			    console.log("----------my tree----------")
-			    console.log(myTrees);
+                //build link list from my database
+                console.log("----------building my_linklist----------");
+                var my_linklist = new llist.linklist();
+                my_linklist.init(my_updateHistory[0].base_id);
+                my_linklist.createFromArray(my_updateHistory);
+                console.log("<show me the linklist>");
+                my_linklist.print();
+                
+                //build link list from other devices's data
+                console.log("----------building other_linklist----------");
+                var other_linklist = new llist.linklist();
+                other_linklist.init(updateActions[0].base_id);
+                other_linklist.createFromArray(updateActions);
+                console.log("<show me the linklist>");
+                other_linklist.print();
 
 
-                //build trees from other devices 
-                var other_trees = new Array();
-			    for(var k in initTreeHead){
-			    	var newTree = new llist.linklist();
-			    	newTree.init(initTreeHead[k]);
-			    	newTree.createFromArray(newTree.head,updateActions);
-			    	myTrees.push(newTree);
-			    	console.log("<show me the linklist>")
-			    	newTree.print()
-			    	//myTrees.put(newTree.head.data.dataURI,newTree);
-			    }
-			    console.log("----------other tree----------")
-			    console.log(myTrees);
+                var my_versions = {
+                	head: "",
+                	tail: "",
+                	versions: null,
+                	operations: null
+                };
+                var m_tmpVersion = new HashTable();
+                var m_tmpOperation = new HashTable();
+                m_tmpVersion.initHash(my_updateHistory);
+                m_tmpOperation.initHash(my_updateOperations);
+
+                my_versions.versions = m_tmpVersion;
+                my_versions.operations = m_tmpOperation;
+                my_versions.head = m_tmpVersion.head;
+                my_versions.tail = m_tmpVersion.tail;
+
+
+                var other_versions = {
+                	head: "",
+                	tail: "",
+                	versions: null,
+                	operations: null,
+                };
+
+                var o_tmpVersion = new HashTable();
+                var o_tmpOperation = new HashTable();
+                o_tmpVersion.initHash(other_updateHistory);
+                o_tmpOperation.initHash(other_updateOperations);
+
+                other_versions.versions = o_tmpVersion;
+                other_versions.operations = o_tmpOperation;
+                other_versions.head = o_tmpVersion.head;
+                other_versions.tail = o_tmpVersion.tail;
 
                 //do version control stuff
                 //is it OK to put syncComplete here?
-                versionCtrl(myTrees,other_trees,versionCtrlCB,syncComplete);
+                console.log("----------start dealing with version control----------");
+                //versionCtrl(my_linklist,my_updateOperations,other_linklist,other_updateOperations,versionCtrlCB,syncComplete);
+                versionCtrl(my_versions,other_versions,versionCtrlCB,syncComplete);
 
-                /*
-				console.log("==========start sync update!!!==========");
-				updateActions.forEach(function(updateItem){
-					if(isExist(my_updateHistory,updateItem)){
-						console.log('==========operate on the same file==========');
-						console.log(updateItem);
-						if(isConflict(my_updateHistory,updateItem)){
-							console.log("conflict!!!!!!!!!!!");
-							conflictList.push(updateItem);
-						}else{
-							console.log("it's ok!!!!!!!!!!!");
-							updateList.push(updateItem);
-						}
-					}else{
-						console.log("==========We got a new update:==========");
-						console.log(updateItem);
-						updateList.push(updateItem);
-					};
-				});
-                */
-				//
-				//console.log("==========here are conflicts==========")
-				//console.log(updateList);
-				//versionCtrl(conflictList);
-				//ActionHistory.createAll("update",updateList,function(){console.log("---insert update done!!!---")});
-			});
-		});
+        });
+});
 });
 }
 
+
 //deal with the conflict situation 
-function versionCtrlCB(myTrees,other_trees){                                                                                                                                                                                                                                                                                                                                                                                                           
-    //to be continue ......
+function versionCtrlCB(my_versions,other_versions,versionCtrlCB,syncComplete){                                                                                                                                                                                                                                                                                                                                                                                                           
+
+	var my_head = my_versions.head;
+	var my_tail = my_versions.tail;
+	var other_head = other_versions.head;
+	var other_tail = other_versions.tail;
+
+    //fisrt compare the final version
+    ////not the same
+	if(my_tail !== other_tail && !isSame(my_tail,my_versions,other_tail,other_versions)){
+		var my_coPoint = isPrevVersion(other_tail,my_linklist);
+		var other_coPoint = isPrevVersion(my_tail,other_linklist);
+
+		var my_operation = getOperations(my_startNode.reversion_id,my_operations);
+		var other_operation = getOperations(other_startNode.reversion_id,other_operations);
+
+		//put heads into my_linklist
+
+
+        //the final version is not same and is not any prev version of another linklist
+        //considered as a conlict occur
+		if(my_coPoint == null && other_coPoint == null){
+			isConflictCB(my_tail,other_tail);
+		}
+		//other_tail is a prev version of my_linklist
+		else if(my_coPoint !== null ){
+			var newUpdateHistory = new Array();
+			var newOperations = new Array();
+
+            //this array will be inserted into db
+			while(other_tail!== other_linklist.head){
+				newUpdateHistory.push(other_tail.data);
+				other_tail = other_tail.prev;
+			}
+			//reset head of my_linklist; would contain 2 children
+			setUpdateHistory("child",other_linklist.head.next,my_linklist.head.version_id);
+			newUpdateCB(newUpdateHistory,newOperations);
+			return;
+		}
+		//my_tail is a prev versoin of other_linklist
+		else if(other_coPoint !== null){
+			var newUpdateHistory = new Array();
+			var newOperations = new Array();
+
+            //put my_tail to the coPoint
+			other_coPoint.next.prev = my_tail.version_id;
+			//add coPoint to my_tail.child; would contain 2 children
+			setUpdateHistory("parent",my_linklist.tail.next,other_coPoint.version_id);
+
+            //this array will be inserted into db
+			while(other_tail!== null){
+				newUpdateHistory.push(other_tail.data);
+				other_tail = other_tail.next;
+			}
+			//reset head of my_linklist;should contain 2 child
+			newUpdateCB(newUpdateHistory,newOperations);
+			return;
+		}
+	////final version is the same
+	}else{
+		var newUpdateHistory = new Array();
+		var newOperations = new Array();
+
+        //get the last same node of 2 linklist, from this node we start merge
+		while(other_tail!==other_linklist.head || my_tail!==my_linklist.head){
+			if(other_tail.version_id === my_linklist.version_id){
+				other_tail = other_tail.prev;
+				my_tail = my_tail.prev;
+			}
+		}
+
+		other_tail.prev.child = my_tail.version_id;
+		other_tail.tail = other_tail.prev;
+
+		//reset head of my_linklist; would contain 2 children
+		setUpdateHistory("child",other_linklist.head.next,my_linklist.head.version_id);
+		newUpdateCB(newUpdateHistory,newOperations);
+
+        //this array will be inserted into db
+        while(other_tail!== other_linklist.head){
+        	newUpdateHistory.push(other_tail.data);
+        	other_tail = other_tail.prev;
+        }
+        
+		return;
+	}
+}
+
+/*
+//deal with the conflict situation 
+function versionCtrlCB(my_linklist,my_updateOperations,other_linklist,other_updateOperations,isConflictCB,newUpdateCB){                                                                                                                                                                                                                                                                                                                                                                                                           
+
+	var my_operations = my_updateOperations;
+	var other_operations = other_updateOperations;
+
+	var my_head = my_linklist.head;
+	var other_head = other_linklist.head;
+
+	var my_tail = my_linklist.tail;
+	var other_tail = other_linklist.tail;
+
+    //fisrt compare the final version
+    ////not the same
+	if(my_tail.version_id !== other_tail.version_id && !isSame(my_tail,other_tail)){
+		var my_coPoint = isPrevVersion(other_tail,my_linklist);
+		var other_coPoint = isPrevVersion(my_tail,other_linklist);
+
+		var my_operation = getOperations(my_startNode.reversion_id,my_operations);
+		var other_operation = getOperations(other_startNode.reversion_id,other_operations);
+
+		//put heads into my_linklist
+
+
+        //the final version is not same and is not any prev version of another linklist
+        //considered as a conlict occur
+		if(my_coPoint == null && other_coPoint == null){
+			isConflictCB(my_tail,other_tail);
+		}
+		//other_tail is a prev version of my_linklist
+		else if(my_coPoint !== null ){
+			var newUpdateHistory = new Array();
+			var newOperations = new Array();
+
+            //this array will be inserted into db
+			while(other_tail!== other_linklist.head){
+				newUpdateHistory.push(other_tail.data);
+				other_tail = other_tail.prev;
+			}
+			//reset head of my_linklist; would contain 2 children
+			setUpdateHistory("child",other_linklist.head.next,my_linklist.head.version_id);
+			newUpdateCB(newUpdateHistory,newOperations);
+			return;
+		}
+		//my_tail is a prev versoin of other_linklist
+		else if(other_coPoint !== null){
+			var newUpdateHistory = new Array();
+			var newOperations = new Array();
+
+            //put my_tail to the coPoint
+			other_coPoint.next.prev = my_tail.version_id;
+			//add coPoint to my_tail.child; would contain 2 children
+			setUpdateHistory("parent",my_linklist.tail.next,other_coPoint.version_id);
+
+            //this array will be inserted into db
+			while(other_tail!== null){
+				newUpdateHistory.push(other_tail.data);
+				other_tail = other_tail.next;
+			}
+			//reset head of my_linklist;should contain 2 child
+			newUpdateCB(newUpdateHistory,newOperations);
+			return;
+		}
+	////final version is the same
+	}else{
+		var newUpdateHistory = new Array();
+		var newOperations = new Array();
+
+        //get the last same node of 2 linklist, from this node we start merge
+		while(other_tail!==other_linklist.head || my_tail!==my_linklist.head){
+			if(other_tail.version_id === my_linklist.version_id){
+				other_tail = other_tail.prev;
+				my_tail = my_tail.prev;
+			}
+		}
+
+		other_tail.prev.child = my_tail.version_id;
+		other_tail.tail = other_tail.prev;
+
+		//reset head of my_linklist; would contain 2 children
+		setUpdateHistory("child",other_linklist.head.next,my_linklist.head.version_id);
+		newUpdateCB(newUpdateHistory,newOperations);
+
+        //this array will be inserted into db
+        while(other_tail!== other_linklist.head){
+        	newUpdateHistory.push(other_tail.data);
+        	other_tail = other_tail.prev;
+        }
+        
+		return;
+	}
+}
+*/
+
+//callback when conflict occurs
+function isConflictCB(my_version,other_version){
+	//to be continue ...
 
 }
 
+//to set a update_history with new child or parent
+function setUpdateHistory(key,value,version_id){
+
+}
+
+//add new update information into db
+function newUpdateCB(newUpdateHistory,newOperations){
+
+}
+
+//compare the data to decide if the version is same or not
+function isFileSame(){
+	//to be continue ...
+}
+
+//check if the two versions are the same
+function isSame(my_version,my_versions,other_version,other_versions){
+	//need to compare with data
+	var my_operations = my_versions.operations[my_version];
+	var other_operations = other_versions.operations[other_version];
+
+	if(my_version !== other_version){
+		for(var k in my_operations){
+			
+		}
+	}
+	
+
+
+}
+
+/*
 //check is exist or not
 function isExist(List,item){
 	var flag = false;
@@ -442,42 +649,45 @@ function isExist(List,item){
 	});
 	return flag;
 }
+*/
 
-//check if the two versions are the same
-function isSame(node_1,node_2){
-	if(node_1.data.dataURI !== node_2.data.dataURI){
-		console.log("Error! : not the same data! ");
-		return;
+//check if my_version is a prev version in other_linklist
+function isPrevVersion(Node,linklist){
+	var start = linklist.tail;
+	while(start !== null){
+		if(start.version_id !== Node.version_id){
+			start = start.parent;
+		}
 	}
-
-	if(node_1.data.edit_id === node_2.data.edit_id){
-		return true;
-	}else{
-		if(node_1.data.key === node_2.data.key && node_1.data.value === node_2.data.value)
-			return true;
-		else
-			return false;
-	}
-	//to be continue ...
-	//need to compare with data
+	return start;
 }
 
-//check the data is conflict or not
-//need more detail
-//to be continue
-/*
-function isConflict(List,item){
-	var flag = false;
-	if(List === null)
-		return false;
-	List.forEach(function(listItem){
-		if(item.dataURI === listItem.dataURI && item.key === listItem.key){
-			flag = true;
-		}
+//check if keys are conflict
+function isConflict(my_operation,other_operation){
+	if(my_operation === null || other_operation){
+		console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		console.log("Error: operations of this version in update_operations list is EMPTY");
+		console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		return undefined;
+	}
+	my_operation.forEach(function(myItem){
+		other_operation.forEach(function(otherItem){
+			if(myItem.key === otherItem)
+				return true;
+		});
 	});
-	return flag;
-};
-*/
+	return false;
+}
+
+//get operations with specific version_id
+function getOperations(version_id,operations){
+	var allOperations = new Array();
+	for(var k in operations){
+		if(operations[k].version_id === version_id)
+			allOperations.push(operations[k]);
+	}
+	return allOperations;
+}
 
 //Sync complete
 function syncComplete(isLocal,isComplete,deviceId,deviceAddress){
@@ -522,9 +732,9 @@ function syncComplete(isLocal,isComplete,deviceId,deviceAddress){
 	else if(currentState == state.SYNC_COMPLETE){
 		var syncDataObj = {
 			type: "syncComplete",
-  			account: config.ACCOUNT,
-  			deviceId: config.uniqueID,
-  			isComplete: true,
+			account: config.ACCOUNT,
+			deviceId: config.uniqueID,
+			isComplete: true,
 		};
 
 		syncSendMessage(deviceAddress, syncDataObj);
@@ -538,8 +748,6 @@ function syncError(err){
 }
 
 //Export method
-//exports.createHash = createHash;
-//exports.getDiff = getDiff;
 exports.syncStart = syncStart;
 exports.syncRequest = syncRequest;
 exports.syncResponse = syncResponse;
