@@ -14,21 +14,12 @@ io.on('connection', function(socket){
 io.listen(3000);
 */
 
-var nssocket = require('nssocket');
-
-  var server = nssocket.createServer(function (socket) {
-    //
-    // Here `socket` will be an instance of `nssocket.NsSocket`.
-    //
-    socket.send(['you', 'there'],"son of bitch");
-    socket.data(['iam', 'here'], function (data) {
-      //
-      // Good! The socket speaks our language 
-      // (i.e. simple 'you::there', 'iam::here' protocol)
-      //
-      // { iam: true, indeedHere: true }
-      //
-      console.log(data);
-    })
-  });
-  server.listen(6785);
+var WebSocketServer = require('ws').Server
+  , wss = new WebSocketServer({port: 8080});
+  
+wss.on('connection', function(ws) {
+    ws.on('message', function(message) {
+        console.log('received: %s', message);
+    });
+    ws.send('something');
+});

@@ -15,18 +15,12 @@ client.on('message',function (message){
 })
 
 */
-var nssocket = require('nssocket');
-
-  //
-  // Tell the server to listen on port `6785` and then connect to it
-  // using another NsSocket instance.
-  //
-
-
-  var outbound = new nssocket.NsSocket();
-  outbound.data(['you', 'there'], function (data) {
-  	console.log(data)
-    outbound.send(['iam', 'here'], "adwedqwedawfwrgawfrwef");
-  });
-
-  outbound.connect(6785);
+var WebSocket = require('ws');
+var ws = new WebSocket('http://127.0.0.1:8080');
+ws.on('open', function() {
+    ws.send('something');
+});
+ws.on('message', function(data, flags) {
+    // flags.binary will be set if a binary data is received
+    // flags.masked will be set if the data was masked
+});
