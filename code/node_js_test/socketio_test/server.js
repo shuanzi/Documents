@@ -3,7 +3,10 @@ var io = require('socket.io')();
 
 io.on('connection', function(socket){
 	console.log("succsess!")
-	socket.emit('an event', { some: 'data' });
+	socket.emit('message', { some: 'data' });
+	socket.on('message',function (message){
+		console.log(message);
+	})
 });
 
 

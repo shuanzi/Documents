@@ -1,7 +1,7 @@
 //client.js
-var io = require('socket.io')();
+var io = require('socket.io/node_modules/socket.io-client')();
 
-var client = io.connect('http://127.0.0.1:1337', { 'reconnect': false });
+var client = io.connect('http://192.168.161.65', { 'reconnect': false });
 
 client.on('connect', function (data){
 	client.send("awdadevgbvgrgawerg");
@@ -9,4 +9,5 @@ client.on('connect', function (data){
 
 client.on('message',function (message){
 	console.log(message);
+
 })
