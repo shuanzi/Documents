@@ -1,16 +1,17 @@
 //hashtable test file
 //var testHashTable = require('./DeleteSync.js');
-//var test = require("./hashtable").Hashtable();
-var hashtable = require("./testhash");
+var test = require("./hashtable").Hashtable();
+//var hashtable = require("./testhash");
+
 
 
 var test_1 = [
 	{id:"1",dataURI:"test_1"},
-	{id:"2",dataURI:"test_2"},
-	{id:"3",dataURI:"test_3"},
-	{id:"4",dataURI:"test_4"},
-	{id:"5",dataURI:"test_5"},
-	{id:"6",dataURI:"test_6"},
+	{id:"2",dataURI:"test_1"},
+	{id:"3",dataURI:"test_1"},
+	{id:"4",dataURI:"test_1"},
+	{id:"5",dataURI:"test_1"},
+	{id:"6",dataURI:"test_1"},
 ];
 
 var test_2 = [
@@ -34,14 +35,14 @@ var test_2 = [
 //var table_2 = testHashTable.createHash(test_2);
 //console.log(table.entries());
 //console.log(table_2);
-var t1 = new hashtable.HashTable();
+//var t1 = new hashtable.HashTable();
+var table = new test();
+table.createFromArray(test_1);
+//test.remove("test_6");
 
-var test = t1.createHash(test_1);
-test.remove("test_6");
-
-var test3 = t1.getDiff(test_2,test);
-
-console.log(test3);
+//var test3 = t1.getDiff(test_2,test);
+console.log(table.get("test_1"));
+//console.log(test);
 //table.getAll();
 //var diff = testHashTable.getDiff(table_2,table_1);
 
