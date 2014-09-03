@@ -16,7 +16,7 @@ client.on('message',function (message){
 
 */
 var WebSocket = require('ws');
-var ws = new WebSocket('http://127.0.0.1:8080');
+var ws = new WebSocket('http://192.168.161.17:8080');
 ws.on('open', function() {
     ws.send('something');
 });

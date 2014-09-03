@@ -1,0 +1,73 @@
+调用https://www.npmjs.org/package/hashtable并拓展
+
+/demo-rio/nodewebkit/backend/hashTable.js
+--------------------------------------------
+调用方法：
+
+var hashTable = require("./hashTable");
+var table = new hashTable.HashTable();
+table.put("key",{value:"big value"});
+
+使用方法：
+-------------------------------------------------
+put (key,value)
+
+参数
+  key：string
+  value：任何js类型
+
+插入一对新的key/value到hashtable。
+
+-------------------------------------------------
+get (key)
+
+参数
+  key：string
+
+查找并返回key值对应的value。如果没有则返回undefined。
+
+-------------------------------------------------
+remove (key)
+
+参数
+  key：string
+
+查找并删除key值对应的key/value。如果没有则返回undefined。
+-------------------------------------------------
+clear ()
+
+删除所有key/value。
+-------------------------------------------------
+size ()
+
+返回hashtable中key/value对的个数。
+-------------------------------------------------
+rehash (new_size)
+
+扩大hashrable的大小，可能会导致重建hashtable。
+-------------------------------------------------
+createHash (array)
+
+参数
+  array：Array
+
+从一个数组创建hashtable。
+-------------------------------------------------
+getDiff (array,Htable)
+
+参数
+  array：Array
+  Htable： hashtable
+
+对比array和hashtable中的key值，并返回Array里不在Htable
+中的重复的项。
+-------------------------------------------------
+getNotDiff (array,Htable)
+
+参数
+  array：Array
+  Htable： hashtable
+对比array和hashtable中的key值，并返回Array里在Htable
+中的重复的项。
+-------------------------------------------------
+
