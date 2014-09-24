@@ -1,0 +1,35 @@
+<html>
+<head>
+<title>test</title>
+  <script src="../lib/require.js"></script>
+  <script src="../lib/jquery.js"></script>
+  <script src="../lib/api.js"></script>
+
+
+</head>
+<meta charset="UTF-8">
+
+<body>
+
+<script>
+
+function deviceUpCb(data){
+    console.log("device up : ");
+    console.log(data);
+}
+
+function deviceDownCb(data){
+    console.log("device down : ");
+    console.log(data);
+}
+
+WDC.requireAPI(['data'], function(data){
+  console.log("test getDeviceDiscoveryService");
+  data.getDeviceDiscoveryService(deviceUpCb,deviceDownCb);
+});
+
+</script>
+
+
+</body>
+</html>

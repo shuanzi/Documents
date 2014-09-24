@@ -1,0 +1,183 @@
+<html>
+<head>
+    <title>test_filesHandle_API</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    a {
+        font-size: 25px;
+        font-family: sans-serif;
+        line-height: 2;
+    }
+    </style>
+    <script src="../../lib/require.js"></script>
+    <script src="../../lib/jquery.js"></script>
+    <script src="../../lib/api.js"></script>
+</head>
+<body>
+    <script language=javascript>  
+    tryit.document.designMode="On";  
+    tryit.document.open();  
+    tryit.document.innerHTML+=tryit.document.write("<b>asdf</b>");  
+    tryit.document.close();  
+    tryit.focus();  
+
+    function loadResourcesCb(result){
+        tryit.document.write("test API getAllDataByCate()");
+        tryit.document.write("<br/>");
+        tryit.document.write("callback result: "+result);
+        tryit.document.write("<br/>");
+    }
+    function test_loadResources(loadResourcesCb){
+        WDC.requireAPI(['data'], function(data){
+            var path = "/home/xiquan/resources";
+            data.loadResources(loadResourcesCb,path);
+        });
+    }
+
+    function getAllCateCb(array){
+        tryit.document.write("test API getAllCateCb()");
+        tryit.document.write(array);
+    }
+    function test_getAllCate(getAllCateCb){
+        WDC.requireAPI(['data'], function(data){
+            data.getAllCate(getAllCateCb);
+        });
+    }
+
+    function getAllDataByCateCb(text){
+        tryit.document.write("test API getAllDataByCate()");
+        var json=JSON.stringify(text[0]);
+        document.write(json);
+    }
+    function test_getAllDataByCate() {
+        WDC.requireAPI(['data'], function(data){
+            data.getAllDataByCate(getAllDataByCateCb,['Documents']);
+        });
+    }
+
+    function openDataSourceCb(file_content){
+        tryit.document.write("test API openLocalDataSourceByPath()");
+        tryit.document.write("<br/>");
+        tryit.document.write("callback result: "+file_content);
+        tryit.document.write("<br/>");
+    }
+    function test_openLocalDataSourceByPath(openDataSourceCb){
+        WDC.requireAPI(['data'], function(data){
+            var content;
+            data.openLocalDataSourceByPath(openDataSourceCb,content);
+        });
+    }
+
+    function updateDataValueCb(result){
+        tryit.document.write("test API updateDataValue()");
+        tryit.document.write("<br/>");
+        tryit.document.write("callback result: "+result);
+        tryit.document.write("<br/>");        
+    }
+    function test_updateDataValue(updateDataValueCb){
+        WDC.requireAPI(['data'], function(data){
+            var uri;
+            var version;
+            var item;
+            data.updateDataValue(updateDataValueCb,uri,version,item);
+        });
+    }
+
+    function rmDataCb(result){
+        tryit.document.write("test API rmDataByUri()");
+        tryit.document.write("<br/>");
+        tryit.document.write("callback result: "+result);
+        tryit.document.write("<br/>");   
+    }
+    function test_rmDataByUri(rmDataCb){
+        WDC.requireAPI(['data'], function(data){
+            var uri;
+            data.rmDataByUri(rmDataCb, uri);
+        });
+    }
+
+    function getDataCb(result){
+        tryit.document.write("test API getDataByUri()");
+        tryit.document.write("<br/>");
+        tryit.document.write("callback result: "+result);
+        tryit.document.write("<br/>");   
+    }
+    function test_getDataByUri(getDataCb){
+        WDC.requireAPI(['data'], function(data){
+            var uri;
+            data.test_getDataSourceByUri;
+        });
+    }
+
+    function getDataSourceCb(result){
+        tryit.document.write("test API getDataSourceByUri()");
+        tryit.document.write("<br/>");
+        tryit.document.write("callback result: "+result);
+        tryit.document.write("<br/>"); 
+    }
+    function test_getDataSourceByUri(getDataSourceCb){
+        WDC.requireAPI(['data'], function(data){
+            var id;
+            data.getDataSourceByUri(getDataSourceCb, id);
+        });        
+    }
+
+    function getRecentAccessDataCb(result){
+        tryit.document.write("test API getRecentAccessData()");
+        tryit.document.write("<br/>");
+        tryit.document.write("callback result: "+result);
+        tryit.document.write("<br/>"); 
+    }
+    function test_getRecentAccessData(getRecentAccessDataCb){
+        WDC.requireAPI(['data'], function(data){
+            var num;
+            data.getDataSourceByUri(getRecentAccessDataCb, num);
+        });        
+    }
+
+
+    </script>
+
+</p>
+<h2>loadResources(loadResourcesCb,path)<span><a class="mark" href="#test_loadResources" id="test_loadResources" onclick="test_loadResources(loadResourcesCb)">test</a></span></h2>
+<p>具体实现：<br>
+    @method loadResources : 读取某个资源文件夹到数据库<br>
+    @param1 loadResourcesCb : 回调函数<br>
+        @result : string，success代表成功，其他代表失败原因<br>
+    @param2 path : string，要加载资源的路径<br>
+</p>
+<h2>getAllCate(getAllCateCb)<span><a class="mark" href="#test_getAllCate" id="test_getAllCate" onclick="test_getAllCate(getAllCateCb)">test</a></span></h2>
+<p>Throws an exception that displays the values for <code>actual</code> and <code>expected</code> separated by the provided operator.
+
+</p>
+<h2>getAllDataByCate(getAllDataByCateCb,['Documents'])<span><a class="mark" href="#test_getAllDataByCate" id="test_getAllDataByCate" onclick="test_getAllDataByCate(getAllDataByCateCb)">test</a></span></h2>
+<p>Throws an exception that displays the values for <code>actual</code> and <code>expected</code> separated by the provided operator.
+
+</p>
+<h2>openLocalDataSourceByPath(openDataSourceCb,content)<span><a class="mark" href="#test_openLocalDataSourceByPath" id="test_openLocalDataSourceByPath" onclick="test_openLocalDataSourceByPath(openDataSourceCb)">test</a></span></h2>
+<p>Throws an exception that displays the values for <code>actual</code> and <code>expected</code> separated by the provided operator.
+
+</p>
+<h2>updateDataValue(updateDataValueCb,uri,version,item)<span><a class="mark" href="#test_updateDataValue" id="test_updateDataValue" onclick="test_updateDataValue(updateDataValueCb)">test</a></span></h2>
+<p>Throws an exception that displays the values for <code>actual</code> and <code>expected</code> separated by the provided operator.
+
+</p>
+<h2>rmDataByUri(rmDataCb, uri)<span><a class="mark" href="#test_rmDataByUri" id="test_rmDataByUri" onclick="test_rmDataByUri(rmDataCb)">test</a></span></h2>
+<p>Throws an exception that displays the values for <code>actual</code> and <code>expected</code> separated by the provided operator.
+
+</p>
+<h2>getDataByUri(getDataCb, uri)<span><a class="mark" href="#test_getDataByUri" id="test_getDataByUri" onclick="test_getDataByUri(getDataCb)">test</a></span></h2>
+<p>Throws an exception that displays the values for <code>actual</code> and <code>expected</code> separated by the provided operator.
+
+</p>
+<h2>getDataSourceByUri(getDataSourceCb, id)<span><a class="mark" href="#test_getDataSourceByUri" id="test_getDataSourceByUri" onclick="test_getDataSourceByUri(getDataSourceCb)">test</a></span></h2>
+<p>Throws an exception that displays the values for <code>actual</code> and <code>expected</code> separated by the provided operator.
+
+</p>
+<h2>getDataSourceByUri(getRecentAccessDataCb, num)<span><a class="mark" href="#test_getRecentAccessData" id="test_getRecentAccessData" onclick="test_getRecentAccessData(test_getRecentAccessData)">test</a></span></h2>
+<p>Throws an exception that displays the values for <code>actual</code> and <code>expected</code> separated by the provided operator.
+
+    <iframe ID="tryit" MARGINHEIGHT="1" MARGINWIDTH="1" width="100%" height="300" scrolling="auto"></iframe>
+
+</body>
+</html>
