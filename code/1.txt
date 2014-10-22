@@ -1,0 +1,60 @@
+function getTheme(callback) {
+
+  var _themePath = "home/"+config.ACCOUNT + "/WORK_DIRECTORY/app/demo-webde/nw/config/themeConf";
+  var _theme = {};
+  fs.readFile(_themePath, 'utf-8', function(err, data) {
+    if (err) {
+      console.log(err);
+      callback(err);
+    } else {
+      var lines = data.split('\n');
+      for (var i = 0; i < lines.length; ++i) {
+        if (lines[i] == "") continue;
+        var attr = lines[i].split(':');
+        var attrs = attr[1].split(' ');
+        _theme[attr[0]] = {
+          'name': attrs[0],
+          'active': attrs[1],
+          'icon': attrs[2],
+          'path': attrs[3],
+          'id': attrs[4],
+          'pos': {
+            x: attrs[5],
+            y: attrs[6]
+          }
+        };
+      }
+      console.log()
+      callback(_theme);
+    }
+  });
+}
+
+/** 
+ * @Method: addData
+ *    To add data into our data manager. The category of data would be considered
+ *    by it's suffix. Once a specific category is distinguished, a related a des
+ *    file would be created in /.des file and data info would be writen into DB
+ *
+ * @param1: itemPath
+ *    string, a full path string,
+ *            as: '/home/xiquan/resource/Music/goodSong.mp3'
+ *
+ * @param2: itemDesPath
+ *    string, a des file name
+ *            as '/home/xiquan/resource/.des/Music/goodSong.mp3';
+ *
+ * @param3: isLoadEnd
+ *    bool, default false, when the last file is touched, it become true
+ *
+ * @param4: callback
+ *		would parse 2 param to callback
+ *		@param1: isLoadEnd
+ *				bool, same as below		
+ *
+ *		@param2: oNewItem
+ *				object, data info in JSON object. It would have different entries in 
+ *								different category. See the code below
+ *
+ *
+ **/
